@@ -1,0 +1,26 @@
+import express from "express";
+import "dotenv/config";
+
+import connectDB from "./config/db.js";
+import ratelimiter from "./middleware/rateLimiter.js";
+import transactionsRouter from "./routes/transactionsRoute.js";
+
+const port = process.env.PORT || 5001;
+
+const app = express();
+
+// middleware
+app.use(express.json()); // Without this middleware req.body will be undefined
+app.use(ratelimiter);
+
+app.use("/api/transactions", transactionsRouter);
+
+app.get("/", (req, res) => {
+  res.json("It's working");
+});
+
+connectDB().then(() => {
+  app.listen(port, () => {
+    console.log("Server is up and running on PORT:", port);
+  });
+});
